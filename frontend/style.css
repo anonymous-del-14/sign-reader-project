@@ -1,78 +1,209 @@
-:root{
-    --bg:#fff;
-    --muted:#666;
-    --accent:#0b84ff;
-    --card:#f8f9fb}
-*{box-sizing:border-box}
-body{
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
-    margin:0;
-    background:var(--bg);
-    color:#111}
-.wrap{
-    max-width:720px;margin:0 auto;
-    padding:16px}
-h1{
-    font-size:1.3rem;
-    margin:.2rem 0}
-.hint{
-    color:var(--muted);
-    margin-bottom:12px}
-.camera-area{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    flex-direction:column}
-video, img{
-    width:100%;
-    max-width:640px;
-    border-radius:8px;
-    border:1px solid #e6e6e6;
-    background:#000}
-.controls{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin:12px 0}
-.btn{
-    padding:10px 12px;
-    border-radius:8px;
-    border:1px solid #ddd;
-    background:#fff;
-    cursor:pointer}
-.btn.primary{
-    background:var(--accent);
-    color:white;
-    border-color:transparent}
-.file-label input{display:none}
-.options{
-    display:flex;
-    gap:12px;
-    align-items:center;
-    flex-wrap:wrap;
-    margin-bottom:8px}
-.status{
-    margin:8px 0;
-    color:var(--muted)}
-.result{margin-top:12px}
-.small.muted{
-    color:var(--muted);
-    font-size:.9rem;
-    margin-bottom:6px}
-.box{
-    background:var(--card);
-    padding:10px;
-    border-radius:8px;
-    white-space:pre-wrap;
-    min-height:40px}
-.primary-box{border:1px solid #cfe9ff}
-.footer{margin-top:18px;
-    color:var(--muted);
-    font-size:.85rem}
+/* =========================
+   Combined stylesheet
+   ========================= */
 
-/* mobile tweaks */
-@media (max-width:420px){
-  .btn{flex:1;padding:12px}
-  .controls{flex-direction:column}
+/* ---------- Theme variables ---------- */
+:root{
+  --page-bg: #f4f6fc;    /* overall page background */
+  --bg: #ffffff;         /* component background */
+  --card-bg: #f8f9fb;    /* inner card / box background */
+  --muted: #666;
+  --accent: #0b84ff;     /* primary accent */
+  --accent-2: #4d6dff;   /* alternate accent used for buttons */
+  --surface: #fafafa;
+  --radius: 12px;
+  --shadow: 0 10px 25px rgba(0,0,0,0.08);
+  --text: #111;
+  --muted-2: #777;
+  --border: #e6e6e6;
 }
+
+/* ---------- Global reset & layout ---------- */
+*{box-sizing:border-box}
+html,body{
+    height:100%;
+    margin:0;
+    padding:0;
+    font-family:"Inter","Poppins",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--page-bg);
+    color:var(--text)
+}
+
+/* center the app vertically on larger screens, align to top on small screens */
+.app-root, .container, .wrap { width: 90%; max-width: 920px; margin: 40px auto 24px; }
+
+/* Provide a combined container that mimics both designs */
+.container {
+  background: var(--bg);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* alternate smaller wrapping class used in the camera design */
+.wrap { max-width:720px; padding:16px; margin: 28px auto; }
+
+/* ---------- Header / typography ---------- */
+h1{
+  font-size: 1.7rem;            /* merged size */
+  text-align: center;
+  color: #333;
+  margin: 0 0 8px;
+  line-height: 1.1;
+}
+p, .hint {
+  text-align: center;
+  color: var(--muted-2);
+  font-size: 0.95rem;
+  margin: 0 0 12px;
+}
+
+/* ---------- Upload / camera area ---------- */
+.upload-box {
+  border: 2px dashed rgba(138,164,240,0.9);
+  background: #f0f3ff;
+  padding: 28px;
+  text-align: center;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: 0.25s;
+  margin-bottom: 20px;
+}
+.upload-box:hover {
+  background: #e6ebff;
+  border-color: rgba(111,142,247,0.95);
+}
+.upload-box input { display:none; }
+.upload-box span { font-size: 16px; color: #556; }
+
+/* camera area shared styles */
+.camera-area{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  flex-direction:column;
+}
+video, img{
+  width:100%;
+  max-width:640px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:#000;
+  display:block;
+}
+
+/* ---------- Controls & buttons ---------- */
+.controls{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0; align-items:center; }
+.btn{
+  padding:10px 14px;
+  border-radius:8px;
+  border:1px solid #ddd;
+  background:#50ade0;
+  cursor:pointer;
+  font-weight:600;
+  
+}
+.btn:hover{ transform: translateY(-1px); }
+.btn.primary{
+  background: var(--accent);
+  color: white;
+  border-color: transparent;
+}
+.btn.ghost{ background:transparent; border:1px solid #ddd; color:var(--text); }
+
+/* preserve legacy button styling for pages that used a global 'button' selector */
+button {
+  background: var(--accent-2);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.25s;
+  display: inline-block;
+}
+button:hover { background: #3b55d6; }
+
+/* file input label */
+.file-label input{ display:none; cursor:pointer; }
+
+/* ---------- Options / status / small text ---------- */
+.options{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+.status{ margin:8px 0; color:var(--muted); font-size:0.95rem; }
+.small.muted{ color:var(--muted); font-size:.9rem; margin-bottom:6px; }
+
+/* ---------- Cards / output boxes ---------- */
+.card, .output-box {
+  background: var(--surface);
+  border: 1px solid #eaeaef;
+  padding: 18px;
+  border-radius: 10px;
+  margin-top: 16px;
+}
+.card { background: var(--bg); box-shadow: 0 6px 18px rgba(16,24,40,0.04); }
+.output-box h3 { margin: 0 0 10px 0; color: #444; font-size:1rem; }
+.output-box p { color: #333; font-size: 0.95rem; text-align:left; }
+
+/* small result/text boxes */
+.box{
+  background: var(--card-bg);
+  padding:10px;
+  border-radius:8px;
+  white-space:pre-wrap;
+  min-height:40px;
+  border: 1px solid #eee;
+}
+.primary-box{ border:1px solid #cfe9ff; background:#980c38; }
+
+/* textarea style (merge from both variants) */
+textarea{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #e6e6e6;
+  resize:vertical;
+  font-family:inherit;
+  font-size:0.95rem;
+  background: #fff;
+}
+
+/* loading / spinner text */
+#loading{ display:none; text-align:center; font-size:16px; color:var(--text); margin-top:10px; }
+
+/* footer */
+.footer { margin-top:18px; color:var(--muted); font-size:.9rem; text-align:center; }
+
+/* ---------- Utility layout helpers ---------- */
+.row{ display:flex; gap:12px; flex-wrap:wrap; }
+.col{ flex:1; min-width:240px; }
+
+/* ---------- Responsive breakpoints ---------- */
+/* small phones */
+@media (max-width:420px){
+  .btn{ flex:1; padding:12px; }
+  .controls{ flex-direction:column; align-items:stretch; }
+  h1{ font-size:1.25rem; }
+  .container { padding: 18px; margin-top: 20px; border-radius: 10px; }
+}
+
+/* medium phones / portrait tablets */
+@media (max-width:600px){
+  h1 { font-size: 22px; }
+  .container { padding: 20px; }
+  button { width: 100%; }
+  video, img { max-width: 100%; }
+}
+
+/* smaller desktop / bigger tablets */
+@media (min-width: 900px){
+  .camera-area { flex-direction:row; gap:16px; align-items:flex-start; }
+}
+
+/* ---------- Accessibility / focus ---------- */
+button:focus, .btn:focus, .file-label:focus { outline: 3px solid rgba(11,132,255,0.15); outline-offset: 2px; }
+
+/* ---------- End of stylesheet ---------- */
+
