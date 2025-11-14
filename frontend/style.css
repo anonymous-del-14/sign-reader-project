@@ -202,6 +202,14 @@ textarea{
   .camera-area { flex-direction:row; gap:16px; align-items:flex-start; }
 }
 
+.hero { display:flex; gap:18px; align-items:center; padding:18px; border-radius:12px;
+       background: linear-gradient(135deg, rgba(11,132,255,0.06), rgba(77,109,255,0.03));
+       margin-bottom:18px; }
+.hero h1 { display:flex; gap:10px; align-items:center; font-weight:700; font-size:1.4rem; }
+.hero h1 .fa-solid { color:var(--accent); font-size:1.2rem; }
+.hero-image { width:80px; height:80px; object-fit:cover; border-radius:12px; border:1px solid var(--border); box-shadow: 0 6px 20px rgba(13,38,76,0.06); }
+
+
 /* ---------- Accessibility / focus ---------- */
 button:focus, .btn:focus, .file-label:focus { outline: 3px solid rgba(11,132,255,0.15); outline-offset: 2px; }
 
