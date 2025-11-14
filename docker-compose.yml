@@ -10,6 +10,7 @@ services:
     environment:
       - LIBRE_URL=http://libretranslate:5000
       - TRANSLATOR=libre
+      - TESS_LANGS=eng,hin,ben,kan,tel,mar,tam,mal    # <-- ADD THIS LINE
     ports:
       - "5000:5000"
     depends_on:
