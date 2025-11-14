@@ -5,64 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Indian Language Image Translator — Sign Reader</title>
 
-  <style>
-    :root{
-      --accent:#3B82F6;
-      --card-bg:white;
-      --bg:#f4f4f4;
-      --muted:#666;
-      --radius:12px;
-      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
-    }
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome (icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    html,body{height:100%;margin:0;background:var(--bg);color:#111}
-    .container{max-width:920px;margin:28px auto;padding:20px}
-    h1{margin:0 0 12px;font-size:1.7rem}
-    p.hint{margin:4px 0 20px;color:var(--muted)}
 
-    .card{
-      background:var(--card-bg);
-      padding:16px;
-      border-radius:var(--radius);
-      box-shadow:0 6px 18px rgba(16,24,40,0.06);
-      margin-bottom:18px;
-    }
-
-    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
-    .btn{
-      background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:none;
-      cursor:pointer;font-weight:600;
-    }
-    .btn.secondary{background:#e5e7eb;color:#111}
-    .btn.ghost{background:transparent;border:1px solid #ddd;color:#111}
-    .btn.primary{background:#0ea5e9}
-
-    .camera-area{
-      display:flex;gap:12px;align-items:center;flex-wrap:wrap;
-    }
-    #preview{max-width:320px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid #eee}
-    video{max-width:320px;border-radius:8px;display:block}
-
-    .file-label{display:inline-block;cursor:pointer}
-    input[type="file"]{display:none}
-
-    .options{margin-top:12px;display:flex;gap:12px;align-items:center}
-    select{padding:8px;border-radius:8px;border:1px solid #ddd}
-
-    .status{margin-top:12px;color:var(--muted)}
-    .result{margin-top:12px}
-    .box{white-space:pre-wrap;background:#fafafa;border:1px solid #eee;padding:12px;border-radius:8px;min-height:60px}
-    .primary-box{background:#eef9ff;border-color:#cbeafe}
-
-    textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;resize:vertical;font-family:inherit}
-
-    .row{display:flex;gap:12px;flex-wrap:wrap}
-    .col{flex:1;min-width:240px}
-
-    footer.footer{margin-top:12px;color:var(--muted);font-size:0.92rem}
-    label.small{font-size:0.9rem;color:var(--muted)}
-    .muted{color:var(--muted);font-size:0.9rem}
-  </style>
 </head>
 <body>
   <div class="container">
