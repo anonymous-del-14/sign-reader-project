@@ -3,56 +3,348 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sign Reader — Mobile</title>
-  <link rel="stylesheet" href="./style.css">
+  <title>Indian Language Image Translator — Sign Reader</title>
+
+  <style>
+    :root{
+      --accent:#3B82F6;
+      --card-bg:white;
+      --bg:#f4f4f4;
+      --muted:#666;
+      --radius:12px;
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    html,body{height:100%;margin:0;background:var(--bg);color:#111}
+    .container{max-width:920px;margin:28px auto;padding:20px}
+    h1{margin:0 0 12px;font-size:1.7rem}
+    p.hint{margin:4px 0 20px;color:var(--muted)}
+
+    .card{
+      background:var(--card-bg);
+      padding:16px;
+      border-radius:var(--radius);
+      box-shadow:0 6px 18px rgba(16,24,40,0.06);
+      margin-bottom:18px;
+    }
+
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+    .btn{
+      background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:none;
+      cursor:pointer;font-weight:600;
+    }
+    .btn.secondary{background:#e5e7eb;color:#111}
+    .btn.ghost{background:transparent;border:1px solid #ddd;color:#111}
+    .btn.primary{background:#0ea5e9}
+
+    .camera-area{
+      display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+    }
+    #preview{max-width:320px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06);border:1px solid #eee}
+    video{max-width:320px;border-radius:8px;display:block}
+
+    .file-label{display:inline-block;cursor:pointer}
+    input[type="file"]{display:none}
+
+    .options{margin-top:12px;display:flex;gap:12px;align-items:center}
+    select{padding:8px;border-radius:8px;border:1px solid #ddd}
+
+    .status{margin-top:12px;color:var(--muted)}
+    .result{margin-top:12px}
+    .box{white-space:pre-wrap;background:#fafafa;border:1px solid #eee;padding:12px;border-radius:8px;min-height:60px}
+    .primary-box{background:#eef9ff;border-color:#cbeafe}
+
+    textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;resize:vertical;font-family:inherit}
+
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .col{flex:1;min-width:240px}
+
+    footer.footer{margin-top:12px;color:var(--muted);font-size:0.92rem}
+    label.small{font-size:0.9rem;color:var(--muted)}
+    .muted{color:var(--muted);font-size:0.9rem}
+  </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Sign Reader</h1>
-    <p class="hint">Take a photo of a sign and get translation.</p>
+  <div class="container">
+    <h1>Indian Language Image Translator — Sign Reader</h1>
+    <p class="hint">Take a photo or choose an image of sign/text. We'll extract text (OCR) and translate to Hindi & English.</p>
 
-    <div class="camera-area">
-      <video id="video" autoplay playsinline hidden></video>
-      <canvas id="canvas" hidden></canvas>
-      <img id="preview" alt="preview" />
+    <div class="card">
+      <div class="camera-area">
+        <div>
+          <video id="video" autoplay playsinline hidden></video>
+          <canvas id="canvas" hidden></canvas>
+          <img id="preview" alt="preview" />
+        </div>
+
+        <div style="flex:1;min-width:220px">
+          <div class="controls">
+            <button id="startBtn" class="btn">Start Camera</button>
+            <button id="stopBtn" class="btn secondary">Stop Camera</button>
+            <button id="snapBtn" class="btn primary">Capture & Translate</button>
+
+            <label class="file-label">
+              <input id="fileInput" type="file" accept="image/*" capture="environment" />
+              <span class="btn ghost">Choose Photo</span>
+            </label>
+          </div>
+
+          <div class="options">
+            <label>Target:
+              <select id="target">
+                <option value="both">Hindi & English</option>
+                <option value="en">English only</option>
+                <option value="hi">Hindi only</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+              </select>
+            </label>
+
+            <label style="margin-left:auto">
+              <input id="autoUpload" type="checkbox" checked /> <span class="small muted">Auto-upload after capture/choose</span>
+            </label>
+          </div>
+
+          <div id="status" class="status">Idle</div>
+        </div>
+      </div>
     </div>
 
-    <div class="controls">
-      <button id="startBtn" class="btn">Start Camera</button>
-      <button id="snapBtn" class="btn primary">Capture & Translate</button>
-      <label class="file-label">
-        <input id="fileInput" type="file" accept="image/*" capture="environment" />
-        <span class="btn">Choose Photo</span>
-      </label>
+    <div class="card">
+      <h3>Extracted Text</h3>
+      <textarea id="originalText" rows="4" placeholder="OCR result will appear here..."></textarea>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button id="manualUploadBtn" class="btn">Upload Current Image (OCR)</button>
+        <button id="translateBtn" class="btn secondary">Translate Text</button>
+        <button id="clearBtn" class="btn ghost">Clear</button>
+      </div>
     </div>
 
-    <div class="options">
-      <label>Target:
-        <select id="target">
-          <option value="en">English</option>
-          <option value="hi">Hindi</option>
-          <option value="fr">French</option>
-          <option value="es">Spanish</option>
-        </select>
-      </label>
+    <div class="row">
+      <div class="col card">
+        <h3>Hindi Translation</h3>
+        <textarea id="hindiText" rows="5" placeholder="Hindi translation..."></textarea>
+      </div>
+      <div class="col card">
+        <h3>English Translation</h3>
+        <textarea id="englishText" rows="5" placeholder="English translation..."></textarea>
+      </div>
     </div>
 
-    <div id="status" class="status">Idle</div>
-
-    <section id="result" class="result" aria-live="polite">
-      <h2>Result</h2>
-      <div id="detected" class="small muted"></div>
-      <pre id="original" class="box"></pre>
-      <pre id="translation" class="box primary-box"></pre>
-    </section>
-
-    <footer class="footer">Tip: allow camera access. Works best via HTTPS or localhost.</footer>
-  </main>
+    <footer class="footer">Tip: allow camera access. Runs best via HTTPS or on localhost. Backend endpoints expected at <code>/ocr</code> and <code>/translate</code> on the configured BACKEND_URL.</footer>
+  </div>
 
   <script>
-    // change this if your backend runs on a different host/port
-    window.BACKEND_URL = 'http://localhost:5000';
+    // Adjust this to your backend base URL (including protocol and port if needed).
+    // Example: 'http://localhost:5000' or 'https://api.example.com'
+    const BACKEND_URL = 'http://localhost:5000';
+
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const preview = document.getElementById('preview');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const snapBtn = document.getElementById('snapBtn');
+    const fileInput = document.getElementById('fileInput');
+    const statusEl = document.getElementById('status');
+    const autoUpload = document.getElementById('autoUpload');
+
+    const originalTextEl = document.getElementById('originalText');
+    const hindiTextEl = document.getElementById('hindiText');
+    const englishTextEl = document.getElementById('englishText');
+
+    const manualUploadBtn = document.getElementById('manualUploadBtn');
+    const translateBtn = document.getElementById('translateBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const targetEl = document.getElementById('target');
+
+    let stream = null;
+    let lastBlob = null;
+
+    function setStatus(s){
+      statusEl.textContent = s;
+    }
+
+    async function startCamera(){
+      try{
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+        video.srcObject = stream;
+        video.hidden = false;
+        preview.hidden = true;
+        setStatus('Camera started');
+      } catch(err){
+        console.error(err);
+        setStatus('Camera error: ' + (err.message || err));
+      }
+    }
+
+    function stopCamera(){
+      if(stream){
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      video.srcObject = null;
+      video.hidden = true;
+      setStatus('Camera stopped');
+    }
+
+    function captureToPreview(){
+      const w = video.videoWidth || 1280;
+      const h = video.videoHeight || 720;
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, w, h);
+      canvas.toBlob(blob => {
+        lastBlob = blob;
+        preview.src = URL.createObjectURL(blob);
+        preview.hidden = false;
+        video.hidden = true;
+        setStatus('Captured image ready');
+        if(autoUpload.checked) uploadBlobForOCR(blob);
+      }, 'image/jpeg', 0.92);
+    }
+
+    function handleFileSelect(e){
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      lastBlob = file;
+      preview.src = URL.createObjectURL(file);
+      preview.hidden = false;
+      video.hidden = true;
+      setStatus('Image chosen');
+      if(autoUpload.checked) uploadBlobForOCR(file);
+    }
+
+    async function uploadBlobForOCR(blob){
+      try{
+        setStatus('Uploading image to OCR...');
+        const fd = new FormData();
+        fd.append('image', blob, 'photo.jpg');
+
+        const res = await fetch(`${BACKEND_URL}/ocr`, {
+          method: 'POST',
+          body: fd
+        });
+
+        if(!res.ok) throw new Error('OCR request failed: ' + res.status);
+        const data = await res.json();
+        // assume response { text: "..." }
+        originalTextEl.value = data.text || data?.result || '';
+        setStatus('OCR complete');
+        // auto-translate based on target selection
+        if(targetEl.value){
+          autoTranslateAfterOCR();
+        }
+      } catch(err){
+        console.error(err);
+        setStatus('OCR error: ' + (err.message || err));
+      }
+    }
+
+    async function translateText(text, targets){
+      try{
+        setStatus('Translating...');
+        const body = { text, targets };
+        const res = await fetch(`${BACKEND_URL}/translate`, {
+          method:'POST',
+          headers:{ 'Content-Type':'application/json' },
+          body: JSON.stringify(body)
+        });
+        if(!res.ok) throw new Error('Translate request failed: ' + res.status);
+        const data = await res.json();
+        setStatus('Translation complete');
+        return data; // expect something like { hi: "...", en: "...", fr: "..."}
+      } catch(err){
+        console.error(err);
+        setStatus('Translate error: ' + (err.message || err));
+        return null;
+      }
+    }
+
+    async function autoTranslateAfterOCR(){
+      const txt = originalTextEl.value.trim();
+      if(!txt) return;
+      const t = targetEl.value;
+      let targets = [];
+      if(t === 'both') targets = ['hi','en'];
+      else targets = [t];
+      const res = await translateText(txt, targets);
+      if(!res) return;
+      // fill fields if present
+      if(res.hi !== undefined) hindiTextEl.value = res.hi;
+      if(res.en !== undefined) englishTextEl.value = res.en;
+      // sometimes backend returns keyed by target language
+      if(t !== 'both' && res[targetEl.value] !== undefined){
+        if(targetEl.value === 'hi') hindiTextEl.value = res[targetEl.value];
+        else if(targetEl.value === 'en') englishTextEl.value = res[targetEl.value];
+      }
+    }
+
+    // Manual handlers
+    startBtn.addEventListener('click', startCamera);
+    stopBtn.addEventListener('click', stopCamera);
+    snapBtn.addEventListener('click', () => {
+      if(stream) captureToPreview();
+      else {
+        // if camera not running, but we have preview, just upload
+        if(lastBlob) {
+          uploadBlobForOCR(lastBlob);
+        } else {
+          setStatus('No camera or image available');
+        }
+      }
+    });
+    fileInput.addEventListener('change', handleFileSelect);
+    manualUploadBtn.addEventListener('click', () => {
+      if(!lastBlob){
+        setStatus('Choose or capture an image first');
+        return;
+      }
+      uploadBlobForOCR(lastBlob);
+    });
+
+    translateBtn.addEventListener('click', async () => {
+      const txt = originalTextEl.value.trim();
+      if(!txt){ setStatus('No text to translate'); return; }
+      const t = targetEl.value;
+      let targets = (t === 'both') ? ['hi','en'] : [t];
+      const res = await translateText(txt, targets);
+      if(!res) return;
+      if(res.hi !== undefined) hindiTextEl.value = res.hi;
+      if(res.en !== undefined) englishTextEl.value = res.en;
+      if(targets.length===1){
+        const key = targets[0];
+        if(key === 'hi') hindiTextEl.value = res[key] ?? '';
+        if(key === 'en') englishTextEl.value = res[key] ?? '';
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      originalTextEl.value='';
+      hindiTextEl.value='';
+      englishTextEl.value='';
+      preview.src='';
+      preview.hidden=true;
+      lastBlob=null;
+      setStatus('Cleared');
+    });
+
+    // convenience: allow paste of image into page
+    window.addEventListener('paste', (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      for(const it of items){
+        if(it.type.indexOf('image') === 0){
+          const blob = it.getAsFile();
+          lastBlob = blob;
+          preview.src = URL.createObjectURL(blob);
+          preview.hidden = false;
+          video.hidden = true;
+          setStatus('Pasted image');
+          if(autoUpload.checked) uploadBlobForOCR(blob);
+        }
+      }
+    });
   </script>
-  <script src="./app.js"></script>
 </body>
 </html>
