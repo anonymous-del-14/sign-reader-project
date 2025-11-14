@@ -1,0 +1,26 @@
+﻿version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: sign-backend
+    env_file:
+      - ./.env.compose
+    environment:
+      - LIBRE_URL=http://libretranslate:5000
+      - TRANSLATOR=libre
+    ports:
+      - "5000:5000"
+    depends_on:
+      - libretranslate
+    restart: unless-stopped
+
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    container_name: libretranslate
+    ports:
+      - "5001:5000"
+    environment:
+      - LISTEN_HOST=0.0.0.0
+    restart: unless-stopped

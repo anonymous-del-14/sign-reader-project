@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sign Reader — Mobile</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="wrap">
+    <h1>Sign Reader</h1>
+    <p class="hint">Take a photo of a sign and get translation.</p>
+
+    <div class="camera-area">
+      <video id="video" autoplay playsinline hidden></video>
+      <canvas id="canvas" hidden></canvas>
+      <img id="preview" alt="preview" />
+    </div>
+
+    <div class="controls">
+      <button id="startBtn" class="btn">Start Camera</button>
+      <button id="snapBtn" class="btn primary">Capture & Translate</button>
+      <label class="file-label">
+        <input id="fileInput" type="file" accept="image/*" capture="environment" />
+        <span class="btn">Choose Photo</span>
+      </label>
+    </div>
+
+    <div class="options">
+      <label>Target:
+        <select id="target">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="fr">French</option>
+          <option value="es">Spanish</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="status" class="status">Idle</div>
+
+    <section id="result" class="result" aria-live="polite">
+      <h2>Result</h2>
+      <div id="detected" class="small muted"></div>
+      <pre id="original" class="box"></pre>
+      <pre id="translation" class="box primary-box"></pre>
+    </section>
+
+    <footer class="footer">Tip: allow camera access. Works best via HTTPS or localhost.</footer>
+  </main>
+
+  <script>
+    // change this if your backend runs on a different host/port
+    window.BACKEND_URL = 'http://localhost:5000';
+  </script>
+  <script src="./app.js"></script>
+</body>
+</html>
