@@ -3,91 +3,226 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Indian Language Image Translator — Sign Reader</title>
+  <title>SnapToScript — Smart Signboard Interpreter</title>
 
   <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   <!-- Font Awesome (icons) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <header class="hero">
-  <div class="hero-left">
-    <h1><i class="fa-solid fa-camera-retro"></i> SnapToScript</h1>
-    <p class="hint">Snap and translate — lightning fast.</p>
-  </div>
-  <img src="https://images.unsplash.com/photo-1706403615881-d83dc2067c5d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cGhvdG9zJTIwb2YlMjBpbmRpYW4lMjBsYW5ndWFnZXN8ZW58MHx8MHx8fDA%3D-...&auto=format&fit=crop&w=800&q=60" alt="hero" class="hero-image">
-</header>
-  
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
 </head>
+
 <body>
-  <div class="container">
-    <h1>Indian Language Image Translator — Sign Reader</h1>
-    <p class="hint">Take a photo or choose an image of sign/text. We'll extract text (OCR) and translate to Hindi & English.</p>
-    
-    <div class="card">
-      <div class="camera-area">
-        <div>
-          <video id="video" autoplay playsinline hidden></video>
-          <canvas id="canvas" hidden></canvas>
-          <img id="preview" alt="preview" />
-        </div>
+  <div class="page-shell">
+    <!-- Hero / top section -->
+    <header class="hero">
+      <div class="hero-left">
+        <div class="hero-kicker">----------------------------------</div>
+        <h1>
+          <span class="logo-icon"><i class="fa-solid fa-camera-retro"></i></span>
+          SnapToScript
+          <span class="hero-highlight">Sign Reader</span>
+        </h1>
+        <p class="hint hero-subtitle">
+          Point your camera at any Indian signboard or upload a photo — get instant text + translations in Hindi & English.
+        </p>
 
-        <div style="flex:1;min-width:220px">
-          <div class="controls">
-            <button id="startBtn" class="btn">Start Camera</button>
-            <button id="stopBtn" class="btn secondary">Stop Camera</button>
-            <button id="snapBtn" class="btn primary">Capture & Translate</button>
-
-            <label class="file-label">
-              <input id="fileInput" type="file" accept="image/*" capture="environment" />
-              <span class="btn ghost">Choose Photo</span>
-            </label>
-          </div>
-
-          <div class="options">
-            <label>Target:
-              <select id="target">
-                <option value="both">Hindi & English</option>
-                <option value="en">English only</option>
-                <option value="hi">Hindi only</option>
-                <option value="fr">French</option>
-                <option value="es">Spanish</option>
-              </select>
-            </label>
-
-            <label style="margin-left:auto">
-              <input id="autoUpload" type="checkbox" checked /> <span class="small muted">Auto-upload after capture/choose</span>
-            </label>
-          </div>
-
-          <div id="status" class="status">Idle</div>
+        <div class="hero-pills">
+          <span class="pill"><i class="fa-solid fa-language"></i> Multilingual OCR</span>
+          <span class="pill"><i class="fa-solid fa-mobile-screen-button"></i> Built for mobile</span>
+          <span class="pill"><i class="fa-solid fa-shield-halved"></i> Runs via secure backend</span>
         </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h3>Extracted Text</h3>
-      <textarea id="originalText" rows="4" placeholder="OCR result will appear here..."></textarea>
-      <div style="margin-top:10px;display:flex;gap:8px;">
-        <button id="manualUploadBtn" class="btn">Upload Current Image (OCR)</button>
-        <button id="translateBtn" class="btn secondary">Translate Text</button>
-        <button id="clearBtn" class="btn ghost">Clear</button>
-      </div>
-    </div>
+      <div class="hero-right">
+        <img src="https://images.unsplash.com/photo-1706403615881-d83dc2067c5d?w=600&auto=format&fit=crop&q=60"
+             alt="Indian signboard photo"
+             class="hero-image">
 
-    <div class="row">
-      <div class="col card">
-        <h3>Hindi Translation</h3>
-        <textarea id="hindiText" rows="5" placeholder="Hindi translation..."></textarea>
+        <div class="hero-mini-card">
+          <div class="mini-icon">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div class="mini-text">
+            <p>Snap · Read · Translate</p>
+            <span>Optimised for Indian signboards & shop fronts</span>
+          </div>
+        </div>
       </div>
-      <div class="col card">
-        <h3>English Translation</h3>
-        <textarea id="englishText" rows="5" placeholder="English translation..."></textarea>
-      </div>
-    </div>
+    </header>
 
-    <footer class="footer">Tip: allow camera access. Runs best via HTTPS or on localhost. Backend endpoints expected at <code>/ocr</code> and <code>/translate</code> on the configured BACKEND_URL.</footer>
+    <!-- Main app container -->
+    <main class="container">
+      <div class="top-bar">
+        <h2>Indian Language Image Translator</h2>
+        <span class="problem-pill">
+          <i class="fa-solid fa-lightbulb"></i>
+          Smart Signboard Interpreter
+        </span>
+      </div>
+
+      <p class="hint">
+        Capture or upload a signboard image. We’ll extract the text (OCR) and translate it into Hindi and English — plus other languages.
+      </p>
+
+      <!-- Steps / flow indicator -->
+      <ul class="steps">
+        <li class="step active"><span>1</span> Capture / Upload</li>
+        <li class="step"><span>2</span> OCR</li>
+        <li class="step"><span>3</span> Translate</li>
+        <li class="step"><span>4</span> Copy & Share</li>
+      </ul>
+
+      <!-- Camera + controls card -->
+      <div class="card">
+        <div class="camera-area">
+          <div class="camera-preview">
+            <video id="video" autoplay playsinline hidden></video>
+            <canvas id="canvas" hidden></canvas>
+            <img id="preview" alt="preview" class="preview-image" />
+
+            <div class="preview-hint">
+              <i class="fa-solid fa-circle-info"></i>
+              Tip: Align the signboard, avoid glare, and keep your hand steady for sharper OCR.
+            </div>
+          </div>
+
+          <div class="camera-side">
+            <div class="controls">
+              <button id="startBtn" class="btn">
+                <i class="fa-solid fa-video"></i>
+                Start Camera
+              </button>
+              <button id="stopBtn" class="btn secondary">
+                <i class="fa-solid fa-stop"></i>
+                Stop Camera
+              </button>
+              <button id="snapBtn" class="btn primary">
+                <i class="fa-solid fa-camera"></i>
+                Capture & Translate
+              </button>
+
+              <label class="file-label">
+                <input id="fileInput" type="file" accept="image/*" capture="environment" />
+                <span class="btn ghost">
+                  <i class="fa-solid fa-image"></i>
+                  Choose Photo
+                </span>
+              </label>
+            </div>
+
+            <div class="options">
+              <label>
+                Target:
+                <select id="target">
+                  <option value="both">Hindi & English</option>
+                  <option value="en">English only</option>
+                  <option value="hi">Hindi only</option>
+                  <option value="fr">French</option>
+                  <option value="es">Spanish</option>
+                </select>
+              </label>
+
+              <label class="auto-upload-label">
+                <input id="autoUpload" type="checkbox" checked />
+                <span class="small muted">Auto-upload after capture/choose</span>
+              </label>
+            </div>
+
+            <div id="status" class="status">
+              <span class="status-dot"></span>
+              Idle
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OCR result card -->
+      <div class="card card-secondary">
+        <div class="card-header">
+          <div class="card-header-left">
+            <i class="fa-solid fa-text-height"></i>
+            <div>
+              <h3>Extracted Text</h3>
+              <p class="card-subtitle">Raw OCR output from the signboard image.</p>
+            </div>
+          </div>
+          <img src="https://plus.unsplash.com/premium_photo-1691763916216-d64cfad0f42e?w=600&auto=format&fit=crop&q=60"
+               loading="lazy"
+               alt="Indian text detail"
+               class="card-thumb">
+        </div>
+
+        <textarea id="originalText" rows="4" placeholder="OCR result will appear here..."></textarea>
+
+        <div class="card-actions">
+          <button id="manualUploadBtn" class="btn">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            Upload Current Image (OCR)
+          </button>
+          <button id="translateBtn" class="btn secondary">
+            <i class="fa-solid fa-language"></i>
+            Translate Text
+          </button>
+          <button id="clearBtn" class="btn ghost">
+            <i class="fa-solid fa-eraser"></i>
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Translations row -->
+      <div class="row">
+        <div class="col card">
+          <div class="card-label">
+            <span class="lang-pill hi-pill">HI</span>
+            <h3>Hindi Translation</h3>
+          </div>
+          <textarea id="hindiText" rows="5" placeholder="Hindi translation..."></textarea>
+        </div>
+        <div class="col card">
+          <div class="card-label">
+            <span class="lang-pill en-pill">EN</span>
+            <h3>English Translation</h3>
+          </div>
+          <textarea id="englishText" rows="5" placeholder="English translation..."></textarea>
+        </div>
+      </div>
+
+      <!-- Info strip / highlights -->
+      <section class="info-strip">
+        <div class="info-item">
+          <i class="fa-solid fa-location-dot"></i>
+          <div>
+            <h4>Real-world use</h4>
+            <p>Perfect for travellers, students, and anyone navigating multilingual Indian streets.</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="fa-solid fa-robot"></i>
+          <div>
+            <h4>AI powered</h4>
+            <p>Uses OCR + translation APIs to understand text in Indian scripts.</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="fa-solid fa-code"></i>
+          <div>
+            <h4>Hackathon ready</h4>
+            <p>Clean UI, pluggable backend endpoints at <code>/ocr</code> &amp; <code>/translate</code>.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        Tip: Allow camera access. Works best over HTTPS or on <code>localhost</code>.
+        Backend endpoints are expected at <code>/ocr</code> and <code>/translate</code> on <code>BACKEND_URL</code>.
+      </footer>
+    </main>
   </div>
-  
+
   <script>
     // Adjust this to your backend base URL (including protocol and port if needed).
     // Example: 'http://localhost:5000' or 'https://api.example.com'
@@ -117,6 +252,10 @@
 
     function setStatus(s){
       statusEl.textContent = s;
+      // Keep the status dot inside
+      const dot = document.createElement('span');
+      dot.className = 'status-dot';
+      statusEl.prepend(dot);
     }
 
     async function startCamera(){
@@ -208,7 +347,7 @@
         if(!res.ok) throw new Error('Translate request failed: ' + res.status);
         const data = await res.json();
         setStatus('Translation complete');
-        return data; // expect something like { hi: "...", en: "...", fr: "..."}
+        return data; // expect something like { hi: "...", en: "...", fr: "..." }
       } catch(err){
         console.error(err);
         setStatus('Translate error: ' + (err.message || err));
