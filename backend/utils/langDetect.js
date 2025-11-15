@@ -2,25 +2,15 @@
 const franc = require('franc');
 
 const FR_TO_SHORT = {
-  // franc outputs ISO639-3; map relevant ones to short codes
-  'hin': 'hi', // Hindi
-  'mar': 'mr', // Marathi
-  'ben': 'bn', // Bengali
-  'kan': 'kn', // Kannada
-  'tel': 'te', // Telugu
-  'tam': 'ta', // Tamil
-  'mal': 'ml', // Malayalam
-  'eng': 'en'
-  // add others if needed
+  'hin': 'hi','mar': 'mr','ben': 'bn','kan': 'kn','tel': 'te','tam': 'ta','mal': 'ml','eng': 'en'
 };
 
 async function detectLanguage(text) {
-  if (!text || text.trim().length < 3) return null;
-  const code = franc(text, { minLength: 10 }); // franc needs enough text
+  if (!text || text.trim().length < 10) return null;
+  const code = franc(text, { minLength: 10 });
   if (!code || code === 'und') return null;
   if (FR_TO_SHORT[code]) return FR_TO_SHORT[code];
-  // fallback: return first two letters of franc code
-  return code.slice(0, 2);
+  return code.slice(0,2);
 }
 
 module.exports = { detectLanguage };

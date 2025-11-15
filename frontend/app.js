@@ -14,20 +14,53 @@ const targetSel = document.getElementById('target');
 let stream = null;
 function setStatus(s){ status.textContent = s; }
 
-async function startCamera(){
-  try {
-    setStatus('Requesting camera...');
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-    video.srcObject = stream;
-    video.hidden = false;
-    preview.hidden = true;
-    await video.play();
-    setStatus('Camera active — frame the sign and tap Capture');
-  } catch (err) {
-    setStatus('Camera error: ' + (err.message || err));
-    alert('Camera access failed: ' + (err.message || err));
-  }
+async function requestCameraPermission() {
+    if (!navigator.permissions) {
+        // iOS Safari does not support permissions API
+        return null;
+    }
+
+    try {
+        const result = await navigator.permissions.query({ name: 'camera' });
+
+        if (result.state === 'denied') {
+            alert("Camera permission denied. Please enable it in your phone settings.");
+            return false;
+        }
+
+        return true;
+
+    } catch (err) {
+        return null; // permissions API unsupported
+    }
 }
+
+async function startCamera() {
+
+    // 1) Check permission BEFORE opening camera
+    const permission = await requestCameraPermission();
+
+    if (permission === false) {
+        alert("Camera permission blocked. Please enable it from browser settings.");
+        return;
+    }
+
+    // 2) Try to open camera
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" }
+        });
+
+        const video = document.getElementById("cameraPreview");
+        video.srcObject = stream;
+        video.play();
+
+    } catch (err) {
+        console.error("Camera error:", err);
+        alert("Unable to access camera. Please allow permissions.");
+    }
+}
+
 
 async function stopCamera(){
   if (stream) {

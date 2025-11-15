@@ -5,6 +5,52 @@ const multer = require('multer');
 const sharp = require('sharp');
 const { recognizeImage } = require('../utils/ocrWorker');
 const { detectLanguage, translateText } = require('../utils/translateHelper');
+// routes/translate.js (or inline in server.js)
+const fetch = require('node-fetch'); // you already have node-fetch in package.json
+
+const INDICTRANS_URL = process.env.INDICTRANS_URL || 'http://localhost:5002'; // host for local dev
+
+// Expected body: { text: "....", targets: ["hi","en"] } or { text, tgt: "en" }
+router.post('/', async (req, res) => {
+  try {
+    const { text, targets, tgt } = req.body || {};
+    if (!text) return res.status(400).json({ error: 'send { text: "...", targets:["hi","en"] }' });
+
+    // If backend only supports single-target, call multiple times
+    const want = targets || (tgt ? [tgt] : ['hi','en']);
+    const out = {};
+
+    for (const lang of want) {
+      // make request to IndicTrans2 service (adjust path if your service uses /translate)
+      const r = await fetch(`${INDICTRANS_URL}/translate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, tgt: lang })
+      });
+
+      if (!r.ok) {
+        // if service returns non-200, propagate error but keep going for other langs
+        out[lang] = null;
+        console.error('IndicTrans2 error', await r.text());
+        continue;
+      }
+      const j = await r.json();
+
+      // adjust this depending on the IndicTrans2 response shape.
+      // Here we support two shapes: { translated: "..." } or { hi: "...", en: "..." }
+      if (j.translated) out[lang] = j.translated;
+      else out[lang] = j[lang] ?? j.result ?? Object.values(j)[0] ?? null;
+    }
+
+    res.json(out);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Translate failed', details: err.message });
+  }
+});
+
+module.exports = router;
+
 
 // multer memory storage (we process buffer directly)
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 8 * 1024 * 1024 } });

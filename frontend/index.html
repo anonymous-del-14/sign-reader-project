@@ -118,19 +118,56 @@
     function setStatus(s){
       statusEl.textContent = s;
     }
+    // Ask permission BEFORE starting the camera
+async function requestCameraPermission() {
+  try {
+    const permission = await navigator.permissions.query({ name: "camera" });
 
-    async function startCamera(){
-      try{
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-        video.srcObject = stream;
-        video.hidden = false;
-        preview.hidden = true;
-        setStatus('Camera started');
-      } catch(err){
-        console.error(err);
-        setStatus('Camera error: ' + (err.message || err));
+    if (permission.state === "denied") {
+      alert("Camera access is blocked. Please enable it in your browser/app settings.");
+      return false;
+    }
+
+    if (permission.state === "prompt") {
+      // Trigger actual camera access request popup
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true });
+      } catch (err) {
+        alert("Please allow camera access to continue.");
+        return false;
       }
     }
+
+    return true;
+  } catch (err) {
+    // If Permissions API not supported (iPhone, some browsers)
+    return true;
+  }
+}
+
+
+    async function startCamera(){
+  const ok = await requestCameraPermission();
+  if (!ok) return;
+
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { facingMode: 'environment' }, 
+      audio: false 
+    });
+
+    video.srcObject = stream;
+    video.hidden = false;
+    preview.hidden = true;
+    setStatus('Camera started');
+
+  } catch(err){
+    console.error(err);
+    alert("Camera error: " + (err.message || err));
+    setStatus('Camera error: ' + (err.message || err));
+  }
+}
+
 
     function stopCamera(){
       if(stream){
@@ -175,26 +212,52 @@
         setStatus('Uploading image to OCR...');
         const fd = new FormData();
         fd.append('image', blob, 'photo.jpg');
+        // optional: include target if your backend uses it
+        fd.append('target', (targetEl.value === 'both' ? 'en' : targetEl.value) );
 
-        const res = await fetch(`${BACKEND_URL}/ocr`, {
+        const res = await fetch(`${BACKEND_URL}/api/translate`, {
           method: 'POST',
           body: fd
         });
 
-        if(!res.ok) throw new Error('OCR request failed: ' + res.status);
-        const data = await res.json();
-        // assume response { text: "..." }
-        originalTextEl.value = data.text || data?.result || '';
+        // always read as text first so we can log HTML errors
+        const raw = await res.text();
+
+        if (!res.ok) {
+          console.error('Server returned non-OK status:', res.status, raw);
+          setStatus('OCR server error: ' + res.status);
+          return;
+        }
+
+        // try to parse JSON; if server returned HTML we'll log it
+        let data;
+        try {
+          data = JSON.parse(raw);
+        } catch (e) {
+          console.error('Server returned non-JSON response for OCR:', raw);
+          setStatus('OCR error: server returned unexpected response (see console)');
+          return;
+        }
+
+        // Normalize possible response shapes:
+        // - { originalText: "...", translatedText: "..." }
+        // - { text: "...", result: "..." }
+        // - { originalText: "...", detectedLanguage: "...", translatedText: {...} }
+        const ocrText = data.originalText || data.text || data.result || data?.ocrText || '';
+        originalTextEl.value = ocrText;
+
         setStatus('OCR complete');
-        // auto-translate based on target selection
-        if(targetEl.value){
+
+        // Auto-translate if the target selection asked for it
+        if (ocrText && targetEl.value) {
           autoTranslateAfterOCR();
         }
       } catch(err){
-        console.error(err);
-        setStatus('OCR error: ' + (err.message || err));
+        console.error('uploadBlobForOCR error', err);
+        setStatus('OCR error: ' + (err.message || String(err)));
       }
     }
+
 
     async function translateText(text, targets){
       try{
